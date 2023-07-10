@@ -3,6 +3,7 @@
 
 #include "sensor.h"
 #include "api-secrets.h"
+#include "rest-api.h"
 
 struct Sensor {
   int id;
@@ -19,11 +20,6 @@ void printSensor (Sensor& sensor) {
   Serial.print(sensor.interval);
   Serial.print(", ");
   Serial.print(sensor.pin);
-}
-
-void sendAuthorization (HttpClient& client) {
-  client.sendHeader("apikey", API_KEY);
-  client.sendHeader("Authorization", API_AUTHORIZATION);
 }
 
 void initSensors(HttpClient& client) {
@@ -65,7 +61,7 @@ void initSensors(HttpClient& client) {
   }
 }
 
-void uploadMeasuremet (HttpClient& client, Sensor& sensor) {
+void uploadMeasurement (HttpClient& client, Sensor& sensor) {
   Serial.print("Upload measurement for sensor: ");
   Serial.println(sensor.id);
 
@@ -98,7 +94,7 @@ void uploadMeasuremet (HttpClient& client, Sensor& sensor) {
 void uploadMeasurements (HttpClient& client, int time) {
   for(int i = 0; i < sensorAmount; i++) {
     if (time % sensors[i].interval == 0) {
-      uploadMeasuremet(client, sensors[i]);
+      uploadMeasurement(client, sensors[i]);
     }
   }
 }
