@@ -38,6 +38,7 @@ boolean initPumps(HttpClient& client) {
     for(int i = 0; i < pumpAmount; i++) {
       printPump(pumps[i]);
       Serial.print("\n");
+      pinMode(pumps[i].pin, OUTPUT);
     }
   }
 
@@ -45,34 +46,40 @@ boolean initPumps(HttpClient& client) {
 }
 
 void irrigate (HttpClient& client, Pump& pump) {
-  Serial.print("Upload measurement for pump: ");
-  Serial.println(pump.id);
+  StaticJsonDocument<256> request;
+  request["pump_id"] = pump.id;
 
-  StaticJsonDocument<256> body;
-  body["pump_id"] = pump.id;
+  StaticJsonDocument<256> response;
 
-  String bodyText;
-  serializeJson(body, bodyText);
+  String url = "/rest/v1/rpc/next_irrigation_job";
+  boolean success = is200Ok(postJsonAndJsonResponse(client, url, request, response));
 
-  Serial.print("Body: ");
-  Serial.println(bodyText);
+  JsonObject nextJob = response.as<JsonObject>();
+  if (success && !nextJob.isNull()) {
+    int time = nextJob["irrigation_time"];
+    request["valid_from"] = nextJob["valid_from"];
+    Serial.print("Start irrigation in pump: ");
+    Serial.print(pump.id);
+    Serial.print(", irrigation time: ");
+    Serial.println(time);
 
-  client.beginRequest();
-  client.post("/rest/v1/rpc/next_irrigation_job");
-  sendAuthorization(client);
-  client.sendHeader("Content-Type", "application/json");
-  client.sendHeader("Content-Length", bodyText.length());
-  client.beginBody();
-  client.print(bodyText);
-  client.endRequest();
+    String startUrl = "/rest/v1/rpc/start_irrigation_job";
+    int startResponseStatus = postJson(client, startUrl, request);
 
-  Serial.print("POST status code: ");
-  Serial.println(client.responseStatusCode());
-  Serial.print("POST response: ");
-  Serial.println(client.responseBody());
+    if (startResponseStatus == 204) {
+      Serial.print("Pumping ");
+      Serial.print(time);
+      Serial.println(" ms");
+      //digitalWrite(pump.pin, HIGH);
+      delay(time);
+      //digitalWrite(pump.pin, LOW);
+      String endUrl = "/rest/v1/rpc/end_irrigation_job";
+      postJson(client, endUrl, request, 3, 204, 10000);
+    }
+  }
 }
 
-void irrigate (HttpClient& client, int time) {
+void irrigate (HttpClient& client) {
   for(int i = 0; i < pumpAmount; i++) {
     irrigate(client, pumps[i]);
   }

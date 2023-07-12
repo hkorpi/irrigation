@@ -50,3 +50,39 @@ int postJson (HttpClient& client, String& url, JsonDocument& body) {
 
   return responseStatus;
 }
+
+JsonResponseStatus postJsonAndJsonResponse (
+  HttpClient& client, String& url, 
+  JsonDocument& request, JsonDocument& response) {
+  
+  Serial.print("POST: ");
+  Serial.println(API_HOST + url);
+
+  client.beginRequest();
+  client.post(url);
+  sendAuthorization(client);
+  client.sendHeader("Content-Type", "application/json");
+  client.sendHeader("Content-Length", measureJson(request));
+  client.beginBody();
+  serializeJson(request, client);
+  client.endRequest();
+
+  int responseStatus = client.responseStatusCode();
+  Serial.print("Response status: ");
+  Serial.println(responseStatus);
+
+  client.skipResponseHeaders();
+
+  return {responseStatus, deserializeJson(response, client)};
+}
+
+int postJson (HttpClient& client, String& url, JsonDocument& body, 
+              int maxRetryAmount, int successStatus, int sleep) {
+  
+  int counter = 0;
+  while (postJson (client, url, body) != successStatus && 
+         counter < maxRetryAmount) {
+    counter++;
+    delay(sleep);
+  }
+}

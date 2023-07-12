@@ -2,4 +2,4 @@
 
 boolean initPumps (HttpClient& client);
 
-void irrigate (HttpClient& client, int time);
+void irrigate (HttpClient& client);

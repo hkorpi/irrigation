@@ -15,3 +15,10 @@ void sendAuthorization (HttpClient& client);
 JsonResponseStatus getJson (HttpClient& client, String& url, JsonDocument& response);
 
 int postJson (HttpClient& client, String& url, JsonDocument& body);
+
+int postJson (HttpClient& client, String& url, JsonDocument& body, 
+              int maxRetryAmount, int successStatus, int sleep);
+
+JsonResponseStatus postJsonAndJsonResponse (
+  HttpClient& client, String& url, 
+  JsonDocument& request, JsonDocument& response);
