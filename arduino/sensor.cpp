@@ -55,26 +55,8 @@ void uploadMeasurement (HttpClient& client, Sensor& sensor) {
   body["sensor_id"] = sensor.id;
   body["moisture"] = analogRead(sensor.pin);
 
-  String bodyText;
-  serializeJson(body, bodyText);
-
-  Serial.print("Body: ");
-  Serial.println(bodyText);
-
-  client.beginRequest();
-  client.post("/rest/v1/moisture");
-  sendAuthorization(client);
-  client.sendHeader("Content-Type", "application/json");
-  client.sendHeader("Content-Length", bodyText.length());
-  client.sendHeader("Prefer", "return=minimal");
-  client.beginBody();
-  client.print(bodyText);
-  client.endRequest();
-
-  Serial.print("POST status code: ");
-  Serial.println(client.responseStatusCode());
-  Serial.print("POST response: ");
-  Serial.println(client.responseBody());
+  String url = "/rest/v1/moisture";
+  postJson(client, url, body);
 }
 
 void uploadMeasurements (HttpClient& client, int time) {

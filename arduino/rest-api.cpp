@@ -29,3 +29,24 @@ JsonResponseStatus getJson (HttpClient& client, String& url, JsonDocument& respo
 boolean is200Ok (JsonResponseStatus status) {
   return status.response == 200 && !status.json;
 }
+
+int postJson (HttpClient& client, String& url, JsonDocument& body) {
+  Serial.print("POST: ");
+  Serial.println(API_HOST + url);
+
+  client.beginRequest();
+  client.post(url);
+  sendAuthorization(client);
+  client.sendHeader("Content-Type", "application/json");
+  client.sendHeader("Content-Length", measureJson(body));
+  client.sendHeader("Prefer", "return=minimal");
+  client.beginBody();
+  serializeJson(body, client);
+  client.endRequest();
+
+  int responseStatus = client.responseStatusCode();
+  Serial.print("Response status: ");
+  Serial.println(responseStatus);
+
+  return responseStatus;
+}

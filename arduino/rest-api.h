@@ -13,3 +13,5 @@ boolean is200Ok (JsonResponseStatus status);
 void sendAuthorization (HttpClient& client);
 
 JsonResponseStatus getJson (HttpClient& client, String& url, JsonDocument& response);
+
+int postJson (HttpClient& client, String& url, JsonDocument& body);
