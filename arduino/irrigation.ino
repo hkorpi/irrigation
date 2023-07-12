@@ -12,8 +12,6 @@
 #include "sensor.h"
 #include "pump.h"
 
-void(* resetFunc) (void) = 0;
-
 char ssid[] = SECRET_SSID;    // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
 
@@ -77,11 +75,11 @@ void setup() {
 
   ArduinoBearSSL.onGetTime(getTime);
 
-  if (!initSensors(client)) {
+  if (!initSensors(client) || !initPumps(client)) {
+    Serial.println("Initialization failed reboot in 10s");
     delay(10000);
-    resetFunc();
+    NVIC_SystemReset();
   };
-  initPumps(client);
 }
 
 void loop() {

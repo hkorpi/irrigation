@@ -13,7 +13,7 @@ JsonResponseStatus getJson (HttpClient& client, String& url, JsonDocument& respo
   Serial.println(API_HOST + url);
 
   client.beginRequest();
-  client.get("/rest/v1/sensor?select=*");
+  client.get(url);
   sendAuthorization(client);
   client.endRequest();
 
