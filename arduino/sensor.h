@@ -1,5 +1,5 @@
 #include <ArduinoHttpClient.h>
 
-void initSensors(HttpClient& client);
+boolean initSensors(HttpClient& client);
 
 void uploadMeasurements (HttpClient& client, int time);

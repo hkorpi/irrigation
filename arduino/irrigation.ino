@@ -10,6 +10,9 @@
 #include "wifi-secrets.h"
 #include "api-secrets.h"
 #include "sensor.h"
+#include "pump.h"
+
+void(* resetFunc) (void) = 0;
 
 char ssid[] = SECRET_SSID;    // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
@@ -74,7 +77,11 @@ void setup() {
 
   ArduinoBearSSL.onGetTime(getTime);
 
-  initSensors(client);
+  if (!initSensors(client)) {
+    delay(10000);
+    resetFunc();
+  };
+  initPumps(client);
 }
 
 void loop() {

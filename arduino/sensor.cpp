@@ -22,43 +22,29 @@ void printSensor (Sensor& sensor) {
   Serial.print(sensor.pin);
 }
 
-void initSensors(HttpClient& client) {
-  Serial.print("Making GET request for sensors: ");
-  Serial.println(API_HOST);
-  
-  client.beginRequest();
-  client.get("/rest/v1/sensor?select=*");
-  sendAuthorization(client);
-  client.endRequest();
-
-  int statusCode = client.responseStatusCode();
-  String response = client.responseBody();
-
-  Serial.print("GET status code: ");
-  Serial.println(statusCode);
-  Serial.print("GET response: ");
-  Serial.println(response);
-
+boolean initSensors(HttpClient& client) {
+  String url = "/rest/v1/sensor?select=*";
   StaticJsonDocument<500> doc;
+  boolean success = is200Ok(getJson(client, url, doc));
 
-  // parse a JSON array
-  deserializeJson(doc, response);
+  if (success) {
+    JsonArray json_sensors = doc.as<JsonArray>();
+    sensorAmount = json_sensors.size();
+    sensors = new Sensor[sensorAmount];
 
-  JsonArray json_sensors = doc.as<JsonArray>();
-  sensorAmount = json_sensors.size();
-  sensors = new Sensor[sensorAmount];
+    for(int i = 0; i < sensorAmount; i++) {
+      sensors[i].id = (int) json_sensors[i]["id"];
+      sensors[i].interval = (int) json_sensors[i]["interval"];
+      sensors[i].pin = (int) json_sensors[i]["pin"];
+    }
 
-  for(int i = 0; i < sensorAmount; i++) {
-    sensors[i].id = (int) json_sensors[i]["id"];
-    sensors[i].interval = (int) json_sensors[i]["interval"];
-    sensors[i].pin = (int) json_sensors[i]["pin"];
+    Serial.println("Found sensors: ");
+    for(int i = 0; i < sensorAmount; i++) {
+      printSensor(sensors[i]);
+      Serial.print("\n");
+    }
   }
-
-  Serial.println("Found sensors: ");
-  for(int i = 0; i < sensorAmount; i++) {
-    printSensor(sensors[i]);
-    Serial.print("\n");
-  }
+  return success;
 }
 
 void uploadMeasurement (HttpClient& client, Sensor& sensor) {
