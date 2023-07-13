@@ -75,6 +75,9 @@ void setup() {
 
   ArduinoBearSSL.onGetTime(getTime);
 
+  // use max resolution for mkr 1000
+  analogReadResolution(12);
+
   if (!initSensors(client) || !initPumps(client)) {
     Serial.println("Initialization failed reboot in 10s");
     delay(10000);
