@@ -90,7 +90,11 @@ void loop() {
   
   uploadMeasurements(client, time);
   irrigate(client);
-  
+
   time++;
-  delay(10000000);
+  if (time % 10 == 0) {
+    Serial.println("Reset to load a new configuration");
+    NVIC_SystemReset();
+  }
+  delay(10000);
 }
