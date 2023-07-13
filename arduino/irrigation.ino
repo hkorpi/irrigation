@@ -90,6 +90,7 @@ void loop() {
   
   uploadMeasurements(client, time);
   irrigate(client);
+  
   time++;
   delay(10000000);
 }

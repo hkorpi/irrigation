@@ -58,10 +58,8 @@ void irrigate (HttpClient& client, Pump& pump) {
   if (success && !nextJob.isNull()) {
     int time = nextJob["irrigation_time"];
     request["valid_from"] = nextJob["valid_from"];
-    Serial.print("Start irrigation in pump: ");
-    Serial.print(pump.id);
-    Serial.print(", irrigation time: ");
-    Serial.println(time);
+    Serial.print("A new irrigation job for pump: ");
+    Serial.println(pump.id);
 
     String startUrl = "/rest/v1/rpc/start_irrigation_job";
     int startResponseStatus = postJson(client, startUrl, request);
@@ -69,13 +67,16 @@ void irrigate (HttpClient& client, Pump& pump) {
     if (startResponseStatus == 204) {
       Serial.print("Pumping ");
       Serial.print(time);
-      Serial.println(" ms");
-      //digitalWrite(pump.pin, HIGH);
-      delay(time);
-      //digitalWrite(pump.pin, LOW);
+      Serial.println(" s");
+      digitalWrite(pump.pin, HIGH);
+      delay(time*1000);
+      digitalWrite(pump.pin, LOW);
       String endUrl = "/rest/v1/rpc/end_irrigation_job";
-      postJson(client, endUrl, request, 3, 204, 10000);
+      postJson(client, endUrl, request, 3, 204, 5000);
     }
+  } else {
+    Serial.print("No irrigation jobs for pump: ");
+    Serial.println(pump.id);
   }
 }
 
