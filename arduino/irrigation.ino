@@ -6,6 +6,7 @@
 #include <SPI.h>
 #include <WiFi101.h>
 #include <ArduinoBearSSL.h>
+#include <ArduinoLowPower.h>
 
 #include "wifi-secrets.h"
 #include "api-secrets.h"
@@ -99,5 +100,6 @@ void loop() {
     Serial.println("Reset to load a new configuration");
     NVIC_SystemReset();
   }
-  delay(10000);
+  WiFi.disconnect();
+  LowPower.sleep(10000);
 }
