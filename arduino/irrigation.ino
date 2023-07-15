@@ -88,6 +88,8 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  while (!Serial) continue;
+
   if (WiFi.status() != WL_CONNECTED) {
     connectWifi();
   }
@@ -101,5 +103,5 @@ void loop() {
     NVIC_SystemReset();
   }
   WiFi.disconnect();
-  LowPower.sleep(10000);
+  LowPower.deepSleep(10000);
 }
