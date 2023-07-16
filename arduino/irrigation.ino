@@ -70,7 +70,7 @@ void setup() {
 
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
-  while (!Serial) continue;
+  //while (!Serial) continue;
 
   connectWifi();
 
@@ -88,20 +88,20 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  while (!Serial) continue;
+  //while (!Serial) continue;
 
   if (WiFi.status() != WL_CONNECTED) {
     connectWifi();
   }
   
-  uploadMeasurements(client, time);
   irrigate(client);
+  uploadMeasurements(client, time);
 
   time++;
-  if (time % 10 == 0) {
+  if (time % 100 == 0) {
     Serial.println("Reset to load a new configuration");
     NVIC_SystemReset();
   }
   WiFi.disconnect();
-  LowPower.deepSleep(10000);
+  LowPower.deepSleep(300000);
 }
