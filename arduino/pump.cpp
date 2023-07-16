@@ -20,7 +20,7 @@ void printPump (Pump& pump) {
 }
 
 boolean initPumps(HttpClient& client) {
-  String url = "/rest/v1/pump?select=*";
+  String url = "/rest/v1/pump?select=id,pin";
   StaticJsonDocument<500> doc;
   boolean success = is200Ok(getJson(client, url, doc));
 

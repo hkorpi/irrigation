@@ -23,7 +23,7 @@ void printSensor (Sensor& sensor) {
 }
 
 boolean initSensors(HttpClient& client) {
-  String url = "/rest/v1/sensor?select=*";
+  String url = "/rest/v1/sensor?select=id,interval,pin";
   StaticJsonDocument<500> doc;
   boolean success = is200Ok(getJson(client, url, doc));
 
@@ -53,9 +53,9 @@ void uploadMeasurement (HttpClient& client, Sensor& sensor) {
 
   StaticJsonDocument<256> body;
   body["sensor_id"] = sensor.id;
-  body["moisture"] = analogRead(sensor.pin);
+  body["value"] = analogRead(sensor.pin);
 
-  String url = "/rest/v1/moisture";
+  String url = "/rest/v1/measurement";
   postJson(client, url, body);
 }
 
