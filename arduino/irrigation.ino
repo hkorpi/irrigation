@@ -79,6 +79,9 @@ void setup() {
   // use max resolution for mkr 1000
   analogReadResolution(12);
 
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+
   if (!initSensors(client) || !initPumps(client)) {
     Serial.println("Initialization failed reboot in 10s");
     delay(10000);
@@ -89,6 +92,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   //while (!Serial) continue;
+  digitalWrite(LED_BUILTIN, HIGH);
 
   if (WiFi.status() != WL_CONNECTED) {
     connectWifi();
@@ -97,11 +101,12 @@ void loop() {
   irrigate(client);
   uploadMeasurements(client, time);
 
+  digitalWrite(LED_BUILTIN, LOW);
   time++;
   if (time % 100 == 0) {
     Serial.println("Reset to load a new configuration");
     NVIC_SystemReset();
   }
   WiFi.disconnect();
-  LowPower.deepSleep(300000);
+  LowPower.deepSleep(60000);
 }
